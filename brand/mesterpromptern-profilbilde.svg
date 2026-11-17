@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 200 200">
+<defs>
+<pattern id="d" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="0.7" fill="#2E3340"/></pattern>
+<linearGradient id="s" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#38E1FF"/><stop offset="1" stop-color="#C6F135"/></linearGradient>
+</defs>
+<rect x="0" y="0" width="200" height="100" fill="#15171C"/>
+<rect x="0" y="0" width="200" height="100" fill="url(#d)"/>
+<rect x="0" y="100" width="200" height="100" fill="#C6F135"/>
+<rect x="0" y="97.5" width="200" height="5" fill="url(#s)"/>
+<path d="M158 34 L161 43 L170 46 L161 49 L158 58 L155 49 L146 46 L155 43 Z" fill="#38E1FF"/>
+<text x="100" y="82" text-anchor="middle" font-family="Inter Display" font-weight="900" font-size="40" letter-spacing="-1.5" fill="#FFFFFF">mester</text>
+<text x="92" y="147" text-anchor="middle" font-family="DejaVu Sans Mono" font-weight="700" font-size="34" letter-spacing="-1" fill="#15171C">prompt</text>
+<rect x="150" y="140" width="16" height="6" fill="#15171C"/>
+</svg>

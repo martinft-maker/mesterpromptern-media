@@ -1,0 +1,12 @@
+# Manus-ID som er rendret og planlagt. Én per linje: id|dato|slot
+# Batch 1 (venter på godkjenning)
+001
+036
+051
+063
+075
+083
+013
+044
+057
+089
