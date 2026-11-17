@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2560" height="1440" viewBox="0 0 2560 1440">
+<defs>
+<pattern id="d" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="16" cy="16" r="2.2" fill="#262A33"/></pattern>
+<linearGradient id="s" x1="0" x2="1"><stop offset="0" stop-color="#38E1FF"/><stop offset="1" stop-color="#C6F135"/></linearGradient>
+<radialGradient id="g" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#C6F135" stop-opacity="0.10"/><stop offset="1" stop-color="#C6F135" stop-opacity="0"/></radialGradient>
+<clipPath id="c"><circle cx="730" cy="720" r="190"/></clipPath>
+</defs>
+<rect width="2560" height="1440" fill="#15171C"/>
+<rect width="2560" height="1440" fill="url(#d)"/>
+<rect x="0" y="0" width="2560" height="1440" fill="url(#g)"/>
+<rect x="0" y="1180" width="2560" height="260" fill="#C6F135"/>
+<rect x="0" y="1172" width="2560" height="10" fill="url(#s)"/>
+<!-- logo circle -->
+<g clip-path="url(#c)">
+<rect x="540" y="530" width="380" height="190" fill="#0B0C10"/>
+<rect x="540" y="720" width="380" height="190" fill="#C6F135"/>
+<rect x="540" y="715" width="380" height="10" fill="url(#s)"/>
+</g>
+<g transform="translate(540,530) scale(1.9)">
+<path d="M158 34 L161 43 L170 46 L161 49 L158 58 L155 49 L146 46 L155 43 Z" fill="#38E1FF"/>
+<text x="100" y="82" text-anchor="middle" font-family="Inter Display" font-weight="900" font-size="40" letter-spacing="-1.5" fill="#FFFFFF">mester</text>
+<text x="92" y="147" text-anchor="middle" font-family="DejaVu Sans Mono" font-weight="700" font-size="34" letter-spacing="-1" fill="#15171C">prompt</text>
+<rect x="150" y="140" width="16" height="6" fill="#15171C"/>
+</g>
+<!-- wordmark + tagline -->
+<text x="985" y="680" font-family="Inter Display" font-weight="900" font-size="108" letter-spacing="-3" fill="#FFFFFF">mesterpromptern</text>
+<text x="988" y="775" font-family="DejaVu Sans Mono" font-weight="700" font-size="50" fill="#C6F135">&gt; One better AI prompt a day_</text>
+<text x="988" y="850" font-family="Inter Display" font-weight="500" font-size="40" fill="#9AA1B0">Copy. Paste. Get answers that actually fit you.</text>
+</svg>
