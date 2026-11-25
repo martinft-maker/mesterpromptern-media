@@ -76,8 +76,13 @@ def load_bank(path):
     bank = {}
     for line in open(path, encoding="utf-8"):
         if re.match(r"^\d{3}\|", line):
-            i, ser, top, bottom = line.rstrip("\n").split("|")
-            bank[i] = {"id": i, "series": ser, "top": top, "bottom": bottom}
+            parts = line.rstrip("\n").split("|")
+            if parts[1] == "R":     # v2 (Martin 25. nov): id|R|hook|result|prompt – resultatet først
+                i, ser, hook, result, prompt = parts
+                bank[i] = {"id": i, "series": ser, "hook": hook, "result": result, "prompt": prompt}
+            else:
+                i, ser, top, bottom = parts
+                bank[i] = {"id": i, "series": ser, "top": top, "bottom": bottom}
     return bank
 
 
@@ -133,8 +138,80 @@ def icon(d, cx, cy, r, kind, col, bg=WHITE):
         d.text((cx, cy + 2), kind, font=F("Bold", 56), fill=col, anchor="mm")
 
 
+CARD = (246, 247, 250)
+
+
+def prepare_r(e):
+    """v2: krok øverst, AI-resultatet i et kort, så tegner lime-panelet med prompten seg opp over kortet."""
+    d = ImageDraw.Draw(Image.new("RGB", (8, 8)))
+    x0 = 96
+    hook = typo(e["hook"])
+    hf, hlh, hw, hn, ok1 = fit(d, hook, "Bold", [92, 84, 76, 68, 60], 1.16, 890, 330)
+    hy = 280
+    card_y = hy + hn * hlh + 56
+    result = typo(e["result"].replace(";;", "\n"))
+    rf, rlh, rw, rn, ok2 = fit(d, result, "Medium", [66, 60, 56, 52, 48, 44, 40, 36], 1.34, 820,
+                               SAFE_BOTTOM - card_y - 150)
+    card_h = 120 + rn * rlh + 50
+    split = card_y - 24
+    prompt = typo(e["prompt"].replace(";;", "\n"))
+    pf, plh, pw, pn, ok3 = fit(d, prompt, "Mono", [58, 54, 50, 46, 42, 39, 36, 33], 1.38, 870,
+                               SAFE_BOTTOM - (split + 212))
+    nr, np_ = len(e["result"].split()), len(e["prompt"].split())
+    rev = min(6.0, max(2.8, 1.0 + nr / 4.6))
+    dur = min(13.0, rev + 0.6 + max(3.0, np_ / 4.6) + 1.2)
+    return {"v2": True, "x0": x0, "hy": hy, "hook": (hf, hw), "card_y": card_y, "card_h": card_h,
+            "result": (rf, rw), "prompt": (pf, pw), "split": split, "rev": (rev, rev + 0.55),
+            "dur": round(dur * FPS) / FPS, "fits": ok1 and ok2 and ok3}
+
+
+def frame_r(t, p):
+    x0 = p["x0"]
+    img = Image.new("RGB", (W, H), RED)
+    d = ImageDraw.Draw(img)
+    fl = F("Bold", 38)
+    d.text((x0, 190), "@" + HANDLE, font=F("Medium", 34), fill=(150, 157, 172))
+    sx, sy, sr = W - 150, 210, 34
+    d.polygon([(sx, sy - sr), (sx + sr * 0.28, sy - sr * 0.28), (sx + sr, sy), (sx + sr * 0.28, sy + sr * 0.28),
+               (sx, sy + sr), (sx - sr * 0.28, sy + sr * 0.28), (sx - sr, sy), (sx - sr * 0.28, sy - sr * 0.28)], fill=CYAN)
+    hf, hw = p["hook"]
+    for w, x, y, ww in hw:
+        d.text((x0 + x, p["hy"] + y), w, font=hf, fill=WHITE)
+    # resultat-kortet (spretter litt inn)
+    sc = 0.96 + 0.04 * ease(prog(t, 0, 0.35))
+    cy, chh = p["card_y"], p["card_h"]
+    cx0, cx1 = 60 + (1 - sc) * 470, W - 60 - (1 - sc) * 470
+    d.rounded_rectangle((cx0, cy, cx1, cy + chh), radius=40, fill=CARD)
+    icon(d, x0 + 30, cy + 70, 30, "check", CARD, bg=CYAN)
+    tracked(d, (x0 + 78, cy + 50), "AI WROTE THIS", F("Bold", 34), INK)
+    rf, rw = p["result"]
+    for w, x, y, ww in rw:
+        d.text((x0 + 10 + x, cy + 120 + y), w, font=rf, fill=INK)
+    # lime-panelet med prompten tegner seg opp over kortet
+    pr = ease(prog(t, *p["rev"]))
+    if pr > 0:
+        split = p["split"]
+        py = H + (split - H) * pr
+        d.rectangle((0, py, W, H), fill=GREEN)
+        d.rectangle((0, py - 5, W, py + 5), fill=CYAN)
+        icon(d, x0 + 42, py + 90 + 42, 42, "check", GREEN, bg=INK)
+        tracked(d, (x0 + 108, py + 104), "THE PROMPT", fl, INK)
+        if t > p["rev"][1] + 1.5:
+            sv = "SAVE IT"
+            tracked(d, (W - x0 - tracked_w(d, sv, fl), py + 104), sv, fl, INK)
+        pf, pw = p["prompt"]
+        for w, x, y, ww in pw:
+            d.text((x0 + x, py + 212 + y), w, font=pf, fill=INK)
+        if pw and int(t * 2) % 2 == 0:
+            w, x, y, ww = pw[-1]; hgt = pf.size
+            d.rectangle((x0 + x + ww + 10, py + 212 + y + hgt * 0.95, x0 + x + ww + 10 + hgt * 0.55, py + 212 + y + hgt * 1.12), fill=INK)
+    return img
+
+
 def prepare(e):
     """Measure once per reel: fonts, wraps, split line, duration."""
+    if e["series"] == "R":
+        return prepare_r(e)
     d = ImageDraw.Draw(Image.new("RGB", (8, 8)))
     top_label, bottom_label, teaser, top_icon, q_top, q_bot, mono = SERIES[e["series"]]
     top = typo(e["top"])
@@ -159,6 +236,8 @@ def prepare(e):
 
 
 def frame(t, p):
+    if p.get("v2"):
+        return frame_r(t, p)
     top_label, bottom_label, teaser, top_icon = p["labels"]
     x0, ty, split = p["x0"], p["ty"], p["split"]
     img = Image.new("RGB", (W, H), RED)
